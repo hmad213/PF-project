@@ -4,57 +4,162 @@
 #include <time.h>
 #include <string.h>
 
-//struct for each block on the grid
-struct block{
-    int value;
-    int cords[2];
-};
-
-//Takes the input of the difficulty of the game from the user. Returns a char from 'E', 'M' or 'H'
-char input(){
-    
+//draws the menu and asks for user input
+void draw_menu(){
+    printf("  ______    ______   __    __   ______\n");  
+    printf("/      \\  /      \\ /  |  /  | /      \\ \n");
+    printf("/$$$$$$  |/$$$$$$  |$$ |  $$ |/$$$$$$  |\n");
+    printf("$$____$$ |$$$  \\$$ |$$ |__$$ |$$ \\__$$ |\n");
+    printf("/    $$/ $$$$  $$ |$$    $$ |$$    $$< \n");
+    printf("/$$$$$$/  $$ $$ $$ |$$$$$$$$ | $$$$$$  |\n");
+    printf("$$ |_____ $$ \\$$$$ |      $$ |$$ \\__$$ |\n");
+    printf("$$       |$$   $$$/       $$ |$$    $$/ \n");
+    printf("$$$$$$$$/  $$$$$$/        $$/  $$$$$$/\n");
 }
 
-//Takes a difficulty level ('E', 'M', 'H') and returns a grid of Block structures sized according to the difficulty
-struct block** set_difficulty(char difficulty){
+// Gets a difficulty level from the user('E', 'M', 'H')
+char select_difficulty(){
+    draw_menu();
+    char difficulty;
+    printf("\nEnter a difficulty level(Easy: 'E', Medium: 'M', Hard: 'H'): ");
+    scanf(" %c", &difficulty);
+    while(difficulty != 'E' && difficulty != 'M' && difficulty != 'H'){
+        system("cls");
+        draw_menu();
+        printf("\n Invalid difficulty. Try again(Easy: 'E', Medium: 'M', Hard: 'H'): ");
+        scanf(" %c", &difficulty);
+    }
+    return difficulty;
+}
 
+//function to get size from difficulty('E', 'M' or 'H')
+int get_size(char difficulty){
+    int size;
+    switch(difficulty){
+        case 'E':
+            size = 5;
+            break;
+        case 'M':
+            size = 4;
+            break;
+        case 'H':
+            size = 3;
+    }
+    return size;
+}
+
+//Takes a difficulty level ('E', 'M', 'H') and returns a grid of integers sized according to the difficulty
+int** set_board(int size){
+    int** board = (int**)malloc(size * sizeof(int*));
+    for(int i = 0; i < size; i++){
+        board[i] = (int*)malloc(size * sizeof(int));
+    }
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            board[i][j] = 0;
+        }
+    }
+    return board;
 }
 
 //Takes a grid and prints the board
-void draw_board(struct block** grid){
-
+void draw_board(int** grid, int size){
+    int i,j;
+    for (i=0;i<size;i++){
+    	printf("\n");
+    	for(j=0;j<size;j++){
+    		printf("  %d",grid[i][j]);
+		}
+	}
 }
-
 //Takes the input of the move of the user. Returns a char from 'W', 'A', 'S', 'D'
 char take_input(){
-
+    char move;
+	int flag =0;
+    printf("\nEnter your move (W = up, A = left, D = right, S= down, Q= quit): ");
+    while(flag ==0 ){
+    	scanf(" %c",&move);
+    	if (move=='W' || move== 'A' || move== 'S' || move== 'D' || move== 'Q'){
+    		flag =1;
+		}
+		else{
+			printf("\nInvalid input try again (W = up, A = left, D = right, S= down, Q= quit): ");
+		}
+	}
+	return move;
 }
 
 //Takes a move ('W', 'A', 'S', 'D') and returns 1 if a move is successful otherwise returns 0
-int move(char move){
-
+int move(char move, int** grid){
+    
 }
 
-//Takes a grid and returns an array of all the blocks that are empty
-struct block* get_empty_spaces(struct block** grid){
+//Takes a grid and returns an array of the coordinates of all the blocks that are empty
+int** get_empty_spaces(int** grid, int size){
+    int** coordinates = NULL;
+    int index = 0;
 
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            if (grid[i][j] == 0){
+                coordinates = (int**)realloc(coordinates, (index+1) * sizeof(int*));
+                coordinates[index] = (int*)malloc(2 * sizeof(int));
+                coordinates[index][0] = i;
+                coordinates[index][1] = j;
+                index++;
+            }
+        }
+    }
+    return coordinates;
 }
 
-//Takes a grid and returns 1 if the game is over and 0 if not
-int check_game_over(struct block** grid){
+//Takes a grid and generates a block of either 2 or 4 in a random empty space in the grid
+void generate_random_block(int** grid, int size){
+}
 
+//Takes a grid and returns 1 if the game is over and 0 if not. This is ONLY for when the user has lost
+int check_game_over(int** grid){
+    
+}
+
+//Takes a grid and returns 1 if the user has won and 0 if not.
+int check_win(int **grid, int size){
+	int i,j,flag=0;
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++){
+			if(grid[i][j] == 2048){
+				return 1;
+			}
+		}
+	}
+	return 0;
 }
 
 //DEFINITION UNFINISHED. Takes a difficulty('E', 'M', 'H') and gets data from the appropriate text file
 void get_high_scores(char difficulty){
-
+    
 }
 
 //DEFINITION UNFINISHED. Takes a score, checks if it is a high score, and saves it appropriately 
 void save_high_scores(){
+    
+}
 
+//Provides the functionality of the game. Game should refresh after every move. Check select_difficulty for reference
+void game_process(){
+    
 }
 
 int main(void){
+    char difficulty = select_difficulty();
+    int size = get_size(difficulty);
+    int** grid = set_board(size);
+    get_empty_spaces(grid, size);
     
+    
+    
+    // Don't touch
+    for(int i = 0; i < size; i++)
+        free(grid[i]);
+    free(grid);
 }
