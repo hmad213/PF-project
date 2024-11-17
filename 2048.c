@@ -212,8 +212,16 @@ void generate_random_block(int** grid, int size){
 }
 
 //Takes a grid and returns 1 if the game is over and 0 if not. This is ONLY for when the user has lost
-int check_game_over(int** grid){
-    
+int check_game_over(int** grid, int size){
+    int i,j,over =1;
+	//incase empty spaces return zero (to be made)
+	for (i=0;i<size-1;i++) {
+		for(j=0;j<size-1;j++){
+			if (grid[i][j]==grid[i+1][j] || grid[i][j]==grid[i][j+1] )
+				over = 0;
+		} 
+	}   
+	return over; 
 }
 
 //Takes a grid and returns 1 if the user has won and 0 if not.
