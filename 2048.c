@@ -90,8 +90,102 @@ char take_input(){
 }
 
 //Takes a move ('W', 'A', 'S', 'D') and returns 1 if a move is successful otherwise returns 0
-int move(char move, int** grid){
+int move(char move, int** grid, int size, int* score){
+    int moved = 0;
+
+    if (move == 'W') {
+        for (int col = 0; col < size; col++) {
+            int target = 0; 
+            for (int row = 0; row < size; row++) {
+                if (grid[row][col] != 0) {
+                    if (target > 0 && grid[target - 1][col] == grid[row][col]) {
+                        grid[target - 1][col] *= 2;
+                        *score += grid[target - 1][col];
+                        grid[row][col] = 0;
+                        moved = 1;
+                    } else {
+                        if (row != target) {
+                            grid[target][col] = grid[row][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                        }
+                        target++;
+                    }
+                }
+            }
+        }
+    }
     
+    else if (move == 'S') {
+        for (int col = 0; col < size; col++) {
+            int target = size - 1; 
+            for (int row = size - 1; row >= 0; row--) {
+                if (grid[row][col] != 0) {
+                    if (target < size - 1 && grid[target + 1][col] == grid[row][col]) {
+                        grid[target + 1][col] *= 2;
+                        *score += grid[target + 1][col];
+                        grid[row][col] = 0;
+                        moved = 1;
+                    } else {
+                        if (row != target) {
+                            grid[target][col] = grid[row][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                        }
+                        target--;
+                    }
+                }
+            }
+        }
+    }
+
+    else if (move == 'A') {
+        for (int row = 0; row < size; row++) {
+            int target = 0; 
+            for (int col = 0; col < size; col++) {
+                if (grid[row][col] != 0) {
+                    if (target > 0 && grid[row][target - 1] == grid[row][col]) {
+                        grid[row][target - 1] *= 2;
+                        *score += grid[row][target - 1];
+                        grid[row][col] = 0;
+                        moved = 1;
+                    } else {
+                        if (col != target) {
+                            grid[row][target] = grid[row][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                        }
+                        target++;
+                    }
+                }
+            }
+        }
+    }
+
+    else if (move == 'D') {
+        for (int row = 0; row < size; row++) {
+            int target = size - 1; 
+            for (int col = size - 1; col >= 0; col--) {
+                if (grid[row][col] != 0) {
+                    if (target < size - 1 && grid[row][target + 1] == grid[row][col]) {
+                        grid[row][target + 1] *= 2;
+                        *score += grid[row][target + 1];
+                        grid[row][col] = 0;
+                        moved = 1;
+                    } else {
+                        if (col != target) {
+                            grid[row][target] = grid[row][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                        }
+                        target--;
+                    }
+                }
+            }
+        }
+    }
+
+    return moved;
 }
 
 //Takes a grid and returns an array of the coordinates of all the blocks that are empty
@@ -154,7 +248,15 @@ int main(void){
     char difficulty = select_difficulty();
     int size = get_size(difficulty);
     int** grid = set_board(size);
-    get_empty_spaces(grid, size);
+    int flag = 1;
+    int* score = 0;
+    grid[0][1] = 2;
+    grid[1][0] = 2;
+    while(flag = 1){
+        draw_board(grid, size);
+        char input = take_input();
+        int successful = move(input, grid, size, score);
+    }
     
     
     
