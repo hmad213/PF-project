@@ -100,13 +100,24 @@ int move(char move, int** grid, int size, int* scorePtr){
     if (move == 'W') {
         for (int col =0; col < size; col++) {
             int target = 0; 
+            int flag = 0;
             for (int row = 0; row < size; row++) {
                 if (grid[row][col] != 0) {
                     if (target >0 && grid[target -1][col] == grid[row][col]) {
-                        grid[target - 1][col] *= 2;
-                        *scorePtr = *scorePtr + grid[target - 1][col];
-                        grid[row][col] = 0;
-                        moved = 1;
+                        if (flag == 0){
+                            grid[target - 1][col] *= 2;
+                            *scorePtr = *scorePtr + grid[target - 1][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                            flag = 1;
+                        }
+                        else{
+                            flag = 0;
+                            grid[target][col] = grid[row][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                            target++;
+                        }
                     } else {
                         if (row!= target) {
                             grid[target][col] = grid[row][col];
@@ -123,13 +134,24 @@ int move(char move, int** grid, int size, int* scorePtr){
     else if (move == 'S') {
         for (int col= 0; col < size; col++) {
             int target = size - 1; 
+            int flag = 0;
             for (int row = size - 1; row >= 0; row--) {
                 if (grid[row][col] != 0) {
                     if (target < size - 1 && grid[target + 1][col] == grid[row][col]) {
-                        grid[target + 1][col] *= 2;
-                        *scorePtr += grid[target + 1][col];
-                        grid[row][col] = 0;
-                        moved = 1;
+                        if(flag == 0){
+                            grid[target + 1][col] *= 2;
+                            *scorePtr += grid[target + 1][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                            flag = 1;
+                        }
+                        else{
+                            flag = 0;
+                            grid[target][col] = grid[row][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                            target--;
+                        }
                     } else {
                         if (row!= target) {
                             grid[target][col] = grid[row][col];
@@ -146,13 +168,24 @@ int move(char move, int** grid, int size, int* scorePtr){
     else if (move == 'A') {
         for (int row = 0; row < size; row++) {
             int target = 0; 
+            int flag = 0;
             for (int col = 0; col < size; col++) {
                 if (grid[row][col] != 0) {
                     if (target > 0 && grid[row][target - 1] == grid[row][col]) {
-                        grid[row][target - 1] *= 2;
-                        *scorePtr += grid[row][target - 1];
-                        grid[row][col] = 0;
-                        moved = 1;
+                        if (flag == 0){
+                            grid[row][target - 1] *= 2;
+                            *scorePtr += grid[row][target - 1];
+                            grid[row][col] = 0;
+                            moved = 1;
+                            flag = 1;
+                        }
+                        else{
+                            flag = 0;
+                            grid[row][target] = grid[row][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                            target++;
+                        }
                     } else {
                         if (col != target) {
                             grid[row][target] = grid[row][col];
@@ -169,13 +202,24 @@ int move(char move, int** grid, int size, int* scorePtr){
     else if (move == 'D') {
         for (int row= 0; row < size; row++) {
             int target = size - 1; 
+            int flag = 0;
             for (int col = size - 1; col >= 0; col--) {
                 if (grid[row][col] != 0) {
                     if (target < size - 1 && grid[row][target + 1] == grid[row][col]) {
-                        grid[row][target + 1] *= 2;
-                        *scorePtr += grid[row][target + 1];
-                        grid[row][col] = 0;
-                        moved = 1;
+                        if (flag == 0){
+                            grid[row][target + 1] *= 2;
+                            *scorePtr += grid[row][target + 1];
+                            grid[row][col] = 0;
+                            moved = 1;
+                            flag = 1;
+                        }
+                        else{
+                            flag = 0;
+                            grid[row][target] = grid[row][col];
+                            grid[row][col] = 0;
+                            moved = 1;
+                            target--;
+                        }
                     } else {
                         if (col!= target) {
                             grid[row][target] = grid[row][col];
@@ -302,6 +346,9 @@ int main(void){
     int** empty = get_empty_spaces(grid, size);
     generate_random_block(grid, size);
     generate_random_block(grid, size);
+    grid[0][0] = 2;
+    grid[3][0] = 2;
+    grid[4][0] = 4;
     while(flag = 1){
         draw_board(grid, size);
         char input = take_input();
