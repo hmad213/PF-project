@@ -64,16 +64,42 @@ int** set_board(int size){
 
 //Takes a grid and prints the board
 void draw_board(int** grid, int size){
-    int i,j;
+    int i,j,l=0,ls=1,number,gap =0,space,g;
+    system("cls");
+    for (i=0;i<size;i++){
+    	for(j=0;j<size;j++){
+    		if (grid[i][j]>l){
+    			l = grid[i][j];
+			}
+		}
+	}
+    while (l !=0){
+    	l = l/10;
+    	ls++;
+	}
     for (i=0;i<size;i++){
     	printf("\n");
     	for(j=0;j<size;j++){
             if(grid[i][j] != 0){
-                printf("  %d",grid[i][j]);
+                printf("%d",grid[i][j]);
             }
     		else{
-                printf("  .");
+                printf(".");
             }
+            number = grid[i][j];
+            gap =0;
+            while(number>0){
+            	gap++;
+            	number = number/10;
+			}
+			if (grid[i][j]==0){
+				gap =1;
+			}
+            space = ls - gap;
+			for(g=0;g<space;g++){
+           		printf(" ");
+			}
+			
 		}
 	}
 }
@@ -123,6 +149,7 @@ int move(char move, int** grid, int size, int* scorePtr){
                             grid[target][col] = grid[row][col];
                             grid[row][col] = 0;
                             moved = 1;
+                            flag = 0;
                         }
                         target++;
                     }
@@ -157,6 +184,7 @@ int move(char move, int** grid, int size, int* scorePtr){
                             grid[target][col] = grid[row][col];
                             grid[row][col] = 0;
                             moved = 1;
+                            flag = 0;
                         }
                         target--;
                     }
@@ -191,6 +219,7 @@ int move(char move, int** grid, int size, int* scorePtr){
                             grid[row][target] = grid[row][col];
                             grid[row][col] = 0;
                             moved = 1;
+                            flag = 0;
                         }
                         target++;
                     }
@@ -225,6 +254,7 @@ int move(char move, int** grid, int size, int* scorePtr){
                             grid[row][target] = grid[row][col];
                             grid[row][col] = 0;
                             moved = 1;
+                            flag = 0;
                         }
                         target--;
                     }
@@ -346,9 +376,6 @@ int main(void){
     int** empty = get_empty_spaces(grid, size);
     generate_random_block(grid, size);
     generate_random_block(grid, size);
-    grid[0][0] = 2;
-    grid[3][0] = 2;
-    grid[4][0] = 4;
     while(flag = 1){
         draw_board(grid, size);
         char input = take_input();
