@@ -3,9 +3,10 @@
 #include <conio.h>
 #include <time.h>
 #include <string.h>
+#include <ctype.h>
 
 //draws the menu and asks for user input
-void draw_menu(){
+void drawLogo(){
     printf("  ______    ______   __    __   ______\n");  
     printf("/      \\  /      \\ /  |  /  | /      \\ \n");
     printf("/$$$$$$  |/$$$$$$  |$$ |  $$ |/$$$$$$  |\n");
@@ -18,22 +19,24 @@ void draw_menu(){
 }
 
 // Gets a difficulty level from the user('E', 'M', 'H')
-char select_difficulty(){
-    draw_menu();
+char drawMenuAndSelectDifficulty(){
+    drawLogo();
     char difficulty;
-    printf("\nEnter a difficulty level(Easy: 'E', Medium: 'M', Hard: 'H'): ");
+    printf("\nEnter a difficulty level(Easy: 'E', Medium: 'M', Hard: 'H', Quit: 'Q'): ");
     scanf(" %c", &difficulty);
-    while(difficulty != 'E' && difficulty != 'M' && difficulty != 'H'){
+    difficulty = toupper(difficulty);
+    while(difficulty != 'E' && difficulty != 'M' && difficulty != 'H' && difficulty != 'Q'){
         system("cls");
-        draw_menu();
-        printf("\n Invalid difficulty. Try again(Easy: 'E', Medium: 'M', Hard: 'H'): ");
+        drawLogo();
+        printf("\n Invalid difficulty. Try again(Easy: 'E', Medium: 'M', Hard: 'H', Quit: 'Q'): ");
         scanf(" %c", &difficulty);
+        difficulty = toupper(difficulty);
     }
     return difficulty;
 }
 
 //function to get size from difficulty('E', 'M' or 'H')
-int get_size(char difficulty){
+int getSize(char difficulty){
     int size;
     switch(difficulty){
         case 'E':
@@ -49,7 +52,7 @@ int get_size(char difficulty){
 }
 
 //Takes a difficulty level ('E', 'M', 'H') and returns a grid of integers sized according to the difficulty
-int** set_board(int size){
+int** setBoard(int size){
     int** board = (int**)malloc(size * sizeof(int*));
     for(int i = 0; i < size; i++){
         board[i] = (int*)malloc(size * sizeof(int));
@@ -63,23 +66,29 @@ int** set_board(int size){
 }
 
 //Takes a grid and prints the board
-void draw_board(int** grid, int size){
-    int i,j,l=0,ls=1,number,gap =0,space,g;
+void drawBoard(int** grid, int size, int score){
+    int i , j, l = 0, ls = 1, number, gap = 0, space, g;
     system("cls");
-    for (i=0;i<size;i++){
-    	for(j=0;j<size;j++){
-    		if (grid[i][j]>l){
+    printf("\n\n");
+    for(i = 0; i < size; i++){
+    	for(j = 0; j < size; j++){
+    		if (grid[i][j] > l){
     			l = grid[i][j];
 			}
 		}
 	}
-    while (l !=0){
+    while(l !=0){
     	l = l/10;
     	ls++;
 	}
-    for (i=0;i<size;i++){
-    	printf("\n");
-    	for(j=0;j<size;j++){
+    printf("                Score: %d\n", score);
+    printf("                ");
+    for(i = 0; i < ls * size + 2; i++){
+        printf("-");
+    }
+    for(i = 0; i < size; i++){
+    	printf("\n                |");
+    	for(j = 0; j < size; j++){
             if(grid[i][j] != 0){
                 printf("%d",grid[i][j]);
             }
@@ -87,34 +96,43 @@ void draw_board(int** grid, int size){
                 printf(".");
             }
             number = grid[i][j];
-            gap =0;
-            while(number>0){
+            gap = 0;
+            while(number > 0){
             	gap++;
             	number = number/10;
 			}
-			if (grid[i][j]==0){
-				gap =1;
+			if (grid[i][j] == 0){
+				gap = 1;
 			}
             space = ls - gap;
-			for(g=0;g<space;g++){
+			for(g = 0; g < space; g++){
            		printf(" ");
 			}
 			
 		}
+        printf("|");
 	}
+    printf("\n");
+    printf("                ");
+    for(i = 0; i < ls * size + 2; i++){
+        printf("-");
+    }
 }
 //Takes the input of the move of the user. Returns a char from 'W', 'A', 'S', 'D'
-char take_input(){
+char drawGameAndTakeInput(int** grid, int size, int score){
     char move;
-	int flag =0;
-    printf("\nEnter your move (W = up, A = left, D = right, S= down, Q= quit): ");
-    while(flag ==0 ){
-    	scanf(" %c",&move);
-    	if (move=='W' || move== 'A' || move== 'S' || move== 'D' || move== 'Q'){
-    		flag =1;
+	int flag = 0;
+    drawBoard(grid, size, score);
+    printf("\nEnter your move (W = up, A = left, D = right, S = down, Q = quit): ");
+    while(flag == 0){
+    	move = getch();
+        move = toupper(move);
+    	if (move =='W' || move == 'A' || move == 'S' || move == 'D' || move == 'Q'){
+    		flag = 1;
 		}
 		else{
-			printf("\nInvalid input try again (W = up, A = left, D = right, S= down, Q= quit): ");
+            drawBoard(grid, size, score);
+			printf("\nInvalid input try again (W = up, A = left, D = right, S = down): ");
 		}
 	}
 	return move;
@@ -141,7 +159,6 @@ int move(char move, int** grid, int size, int* scorePtr){
                             flag = 0;
                             grid[target][col] = grid[row][col];
                             grid[row][col] = 0;
-                            moved = 1;
                             target++;
                         }
                     } else {
@@ -176,7 +193,6 @@ int move(char move, int** grid, int size, int* scorePtr){
                             flag = 0;
                             grid[target][col] = grid[row][col];
                             grid[row][col] = 0;
-                            moved = 1;
                             target--;
                         }
                     } else {
@@ -211,7 +227,6 @@ int move(char move, int** grid, int size, int* scorePtr){
                             flag = 0;
                             grid[row][target] = grid[row][col];
                             grid[row][col] = 0;
-                            moved = 1;
                             target++;
                         }
                     } else {
@@ -246,7 +261,6 @@ int move(char move, int** grid, int size, int* scorePtr){
                             flag = 0;
                             grid[row][target] = grid[row][col];
                             grid[row][col] = 0;
-                            moved = 1;
                             target--;
                         }
                     } else {
@@ -268,7 +282,7 @@ int move(char move, int** grid, int size, int* scorePtr){
 
 
 //Takes a grid and returns number of empty spaces
-int get_empty_number(int** grid, int size){
+int getEmptyNumber(int** grid, int size){
     int total = 0;
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
@@ -281,8 +295,8 @@ int get_empty_number(int** grid, int size){
 }
 
 //Takes a grid and returns an array of the coordinates of all the blocks that are empty
-int** get_empty_spaces(int** grid, int size){
-    int total = get_empty_number(grid, size);
+int** getEmptySpaces(int** grid, int size){
+    int total = getEmptyNumber(grid, size);
     int** coordinates = (int**)malloc(total * sizeof(int*));
     for(int i = 0; i < total; i++){
         coordinates[i] = (int*)malloc(2 * sizeof(int));
@@ -302,9 +316,9 @@ int** get_empty_spaces(int** grid, int size){
 }
 
 //Takes a grid and generates a block of either 2 or 4 in a random empty space in the grid
-void generate_random_block(int** grid, int size){
-    int** coordinates = get_empty_spaces(grid, size);
-    int total = get_empty_number(grid, size);
+void generateRandomBlock(int** grid, int size){
+    int** coordinates = getEmptySpaces(grid, size);
+    int total = getEmptyNumber(grid, size);
     int randIndex = rand() % total;
     int randNumber = (rand() % 10) + 1;
     if(randNumber < 9){
@@ -321,9 +335,9 @@ void generate_random_block(int** grid, int size){
 }
 
 //Takes a grid and returns 1 if the game is over and 0 if not. This is ONLY for when the user has lost
-int check_game_over(int** grid, int size){
+int checkGameOver(int** grid, int size){
     int i, j;
-    if(get_empty_number(grid, size) != 0){
+    if(getEmptyNumber(grid, size) != 0){
         return 0;
     }
 
@@ -338,7 +352,7 @@ int check_game_over(int** grid, int size){
 }
 
 //Takes a grid and returns 1 if the user has won and 0 if not.
-int check_win(int **grid, int size){
+int checkWin(int **grid, int size){
 	int i,j,flag=0;
 	for(i=0;i<size;i++){
 		for(j=0;j<size;j++){
@@ -351,44 +365,132 @@ int check_win(int **grid, int size){
 }
 
 //DEFINITION UNFINISHED. Takes a difficulty('E', 'M', 'H') and gets data from the appropriate text file
-void get_high_scores(char difficulty){
-    
+int* getHighScores(char fileName[]){
+    char line[10];
+    int i = 0;
+    int* scores = (int*)malloc(5 * sizeof(int));
+    if(scores == NULL){
+        printf("Could not allocate memory\n");
+        return NULL;
+    }
+
+    FILE* filePtr = fopen(fileName, "r");
+    if (filePtr == NULL) {
+        printf("Could not read file");
+        return NULL;
+    }
+
+    while(i < 5 && fgets(line, sizeof(line), filePtr) != NULL){
+        sscanf(line, "%d\n", &scores[i]);
+        i++;
+    }
+
+    fclose(filePtr);
+    return scores;
 }
 
 //DEFINITION UNFINISHED. Takes a score, checks if it is a high score, and saves it appropriately 
-void save_high_scores(){
-    
+int saveHighScores(int* scores, int score){
+    int index = -1;
+    for(int i = 0; i < 5; i++){
+        if(score > scores[i]){
+            if(i != 0){
+                scores[i - 1] = scores[i];       
+            }
+            scores[i] = score;
+            index = i;
+        }
+        else{
+            return index;
+        }
+    }
+}
+
+void displayHighScores(int* scores, int score){
+    printf("Your Score: %d\n", score);
+    printf("           High Scores\n");
+    for(int i = 0; i < 5; i++){
+        printf("Number %d:                %d\n", i+1, scores[4-i]);
+    }
+}
+
+void saveInFile(int* scores, char fileName[]){
+    FILE* filePtr = fopen(fileName, "w");
+    if (filePtr == NULL) {
+        printf("Failed to open file");
+        return;
+    }
+
+    for(int i = 0; i < 5; i++){
+        fprintf(filePtr, "%d\n", scores[i]);
+    }
+    fclose(filePtr);
 }
 
 //Provides the functionality of the game. Game should refresh after every move. Check select_difficulty for reference
-void game_process(){
-    
+void game_process(char difficulty){
+    int score = 0;
+    int* scorePtr = &score;
+    int size = getSize(difficulty);
+    int** grid = setBoard(size);
+    generateRandomBlock(grid, size);
+    generateRandomBlock(grid, size);
+    do{
+        char userMove = drawGameAndTakeInput(grid, size, score);
+        if(userMove == 'Q'){
+            printf("\nQuitting...\n");
+            return;
+        }
+        if(move(userMove, grid, size, scorePtr)){
+            generateRandomBlock(grid, size);
+        }
+    }while(!checkWin(grid, size) && !checkGameOver(grid, size));
+    system("cls");
+    drawBoard(grid, size, score);
+    if(checkWin(grid, size)){
+        printf("\nCoungratulations! You have won\n");
+    }
+    else{
+        printf("\nGAME OVER!\n");
+    }
+
+    char filename[20];
+    switch(difficulty){
+        case 'E':
+            strcpy(filename, "easy.txt");
+            break;
+        case 'M':
+            strcpy(filename, "medium.txt");
+            break;
+        case 'H':
+            strcpy(filename, "hard.txt");
+    }
+    int* highScores = getHighScores(filename);
+    int index = saveHighScores(highScores, score);
+    if(index != -1){
+        printf("You have placed %d on the leaderboard!\n", 5 - index);
+        saveInFile(highScores, filename);
+    }
+    displayHighScores(highScores, score);
+
+    for(int i = 0; i < size; i++)
+        free(grid[i]);
+    free(highScores);
+    free(grid);
 }
 
 int main(void){
     srand(time(0));
-    char difficulty = select_difficulty();
-    int size = get_size(difficulty);
-    int** grid = set_board(size);
-    int flag = 1;
-    int score = 0;
-    int* scorePtr = &score;
-    int** empty = get_empty_spaces(grid, size);
-    generate_random_block(grid, size);
-    generate_random_block(grid, size);
-    while(flag = 1){
-        draw_board(grid, size);
-        char input = take_input();
-        int successful = move(input, grid, size, scorePtr);
-        generate_random_block(grid, size);
+    char difficulty;
+    while(difficulty != 'Q'){
+        fflush(stdin);
+        difficulty = drawMenuAndSelectDifficulty();
+        if(difficulty != 'Q'){
+            game_process(difficulty);
+            fflush(stdin);
+            printf("Enter any character to go to menu: ");
+            getch();
+            system("cls");
+        }
     }
-
-    
-    
-    
-    // Don't touch
-    free(scorePtr);
-    for(int i = 0; i < size; i++)
-        free(grid[i]);
-    free(grid);
 }
