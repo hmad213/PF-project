@@ -18,7 +18,7 @@ void drawLogo(){
     printf("$$$$$$$$/  $$$$$$/        $$/  $$$$$$/\n");
 }
 
-// Gets a difficulty level from the user('E', 'M', 'H')
+// Gets a valid difficulty level from the user('E', 'M', 'H') and draws the menu
 char drawMenuAndSelectDifficulty(){
     drawLogo();
     char difficulty;
@@ -118,7 +118,7 @@ void drawBoard(int** grid, int size, int score){
         printf("-");
     }
 }
-//Takes the input of the move of the user. Returns a char from 'W', 'A', 'S', 'D'
+//Takes valid input of the move of the user and draws the game. Returns a char from 'W', 'A', 'S', 'D'
 char drawGameAndTakeInput(int** grid, int size, int score){
     char move;
 	int flag = 0;
@@ -335,21 +335,28 @@ void generateRandomBlock(int** grid, int size){
 }
 
 //Takes a grid and returns 1 if the game is over and 0 if not. This is ONLY for when the user has lost
-int checkGameOver(int** grid, int size){
+int checkGameOver(int** grid, int size) {
     int i, j;
-    if(getEmptyNumber(grid, size) != 0){
+    if (getEmptyNumber(grid, size) != 0) {
         return 0;
     }
-
-	for (i=0;i<size-1;i++) {
-		for(j=0;j<size-1;j++){
-			if (grid[i][j]==grid[i+1][j] || grid[i][j]==grid[i][j+1] )
-				return 0;
-		} 
-	}   
-
-	return 1; 
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size - 1; j++) {
+            if (grid[i][j] == grid[i][j + 1]) {
+                return 0;
+            }
+        }
+    }
+    for (j = 0; j < size; j++) {
+        for (i = 0; i < size - 1; i++) {
+            if (grid[i][j] == grid[i + 1][j]) {
+                return 0;
+            }
+        }
+    }
+    return 1;
 }
+
 
 //Takes a grid and returns 1 if the user has won and 0 if not.
 int checkWin(int **grid, int size){
@@ -364,7 +371,7 @@ int checkWin(int **grid, int size){
 	return 0;
 }
 
-//DEFINITION UNFINISHED. Takes a difficulty('E', 'M', 'H') and gets data from the appropriate text file
+//Takes a filename, gets data from it and stores it in an integer array
 int* getHighScores(char fileName[]){
     char line[10];
     int i = 0;
@@ -389,7 +396,7 @@ int* getHighScores(char fileName[]){
     return scores;
 }
 
-//DEFINITION UNFINISHED. Takes a score, checks if it is a high score, and saves it appropriately 
+//Takes a score and a sorted list of scores. Check if the score is greater than any score on the list and place it accordingly
 int saveHighScores(int* scores, int score){
     int index = -1;
     for(int i = 0; i < 5; i++){
@@ -406,6 +413,7 @@ int saveHighScores(int* scores, int score){
     }
 }
 
+//Takes the User score and sorted list of scores and displays them.
 void displayHighScores(int* scores, int score){
     printf("Your Score: %d\n", score);
     printf("           High Scores\n");
@@ -414,6 +422,7 @@ void displayHighScores(int* scores, int score){
     }
 }
 
+//Takes the sorted list of scores and filename. Stores the list in the file.
 void saveInFile(int* scores, char fileName[]){
     FILE* filePtr = fopen(fileName, "w");
     if (filePtr == NULL) {
@@ -427,7 +436,7 @@ void saveInFile(int* scores, char fileName[]){
     fclose(filePtr);
 }
 
-//Provides the functionality of the game. Game should refresh after every move. Check select_difficulty for reference
+//Provides the complete functionality of the game.
 void game_process(char difficulty){
     int score = 0;
     int* scorePtr = &score;
